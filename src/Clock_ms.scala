@@ -18,8 +18,8 @@ import javax.swing.{Timer => SwingTimer, AbstractAction} // for the Timer
 
 object Clock_ms extends SimpleSwingApplication {
   
-  var xCoordinate = 220
-  var yCoordinate = 70
+  var xCoordinate = 300
+  var yCoordinate = 80
   
   var kirjoitettuNimi= ""
   
@@ -28,7 +28,7 @@ object Clock_ms extends SimpleSwingApplication {
     var ms, msEiNollata = 0
     var str, s, min = "00"
     background = Color.white
-    preferredSize = (420, 590)
+    preferredSize = (460, 590)
   
     
     override def paintComponent(g: Graphics2D) = {
@@ -45,47 +45,50 @@ object Clock_ms extends SimpleSwingApplication {
       g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                          RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
       
-      g.setFont(new Font("Batang", Font.PLAIN, 72))
+      g.setFont(new Font("Batang", Font.PLAIN, 82))
       g.setColor(Color.BLUE)
-      g.drawString(min + ":" + s + ".", xCoordinate - 200, yCoordinate)
-      g.setFont(new Font("Batang", Font.PLAIN, 52))
+      g.drawString(min + ":" + s + ".", xCoordinate - 225, yCoordinate)
+      g.setFont(new Font("Batang", Font.PLAIN, 55))
       g.drawString(str, xCoordinate, yCoordinate)
      
-      var y = 160
+      var y = 150
       g.setFont(new Font("Batang", Font.PLAIN, 22))
       
       var vertaaEdelliseen = 0
+      var monesko = 1
       for (aika <- ajat.sorted){
         if(vertaaEdelliseen != aika){
-            
+            var maxNimenPit = 30
             var nimi = msRiviParit(aika.toString()).head.split(";")(0)
             if(nimi.equals(kirjoitettuNimi))
                  g.setColor(Color.BLUE)
             else g.setColor(Color.RED)   
-            if(nimi.length()>22)
-               g.drawString(nimi.substring(0, 22), 10, y)
-            else  g.drawString(nimi, 10, y)  
+            if(nimi.length()>maxNimenPit)
+               g.drawString(monesko + ".  " + nimi.substring(0, maxNimenPit), 10, y)
+            else  g.drawString(monesko + ".  " +nimi, 10, y)  
             
             if(nimi.equals(kirjoitettuNimi))
                     g.setColor(Color.BLUE)
             else g.setColor(Color.RED)  
-            g.drawString(msRiviParit(aika.toString()).head.split(";")(1), 310,y)  // tulos
-            y += 30
-               
+            g.drawString(msRiviParit(aika.toString()).head.split(";")(1), 350,y)  // tulos
+            y += 33
+            monesko += 1
+            
             if(msRiviParit(aika.toString()).size > 1)   // useammalla sama aika
             for(i <-1 until msRiviParit(aika.toString()).size){
                  var nimi = msRiviParit(aika.toString())(i).split(";")(0)
                  if(nimi.equals(kirjoitettuNimi))
                     g.setColor(Color.BLUE)
                  else g.setColor(Color.RED)   
-                 if(nimi.length()>22)
-                    g.drawString(nimi.substring(0, 22), 10, y)
-                 else  g.drawString(nimi, 10, y)  
+                 if(nimi.length()>maxNimenPit)
+                    g.drawString(monesko-i + ".  " +nimi.substring(0, maxNimenPit), 10, y)
+                 else  g.drawString(monesko-i + ".  " +nimi, 10, y)  
                  if(nimi.equals(kirjoitettuNimi))
                     g.setColor(Color.BLUE)
                  else g.setColor(Color.RED)  
-                 g.drawString(msRiviParit(aika.toString())(i).split(";")(1), 310,y)
-                 y += 30
+                 g.drawString(msRiviParit(aika.toString())(i).split(";")(1), 350,y)
+                 y += 33                 
+                 monesko += 1
               }   
         }   
         vertaaEdelliseen = aika
