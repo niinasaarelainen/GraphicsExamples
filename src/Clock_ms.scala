@@ -67,12 +67,10 @@ object Clock_ms extends SimpleSwingApplication {
             g.fillRect(190, y, 200, 500)
             
             g.setColor(Color.RED)
-         //   if(!tallaHetkellaRuudulla.contains(msRiviParit(aika.toString()).head))   {
                g.drawString(msRiviParit(aika.toString()).head.split(";")(1), 200,y)
                y += 30
-       //     tallaHetkellaRuudulla += msRiviParit(aika.toString()).head
                
-            println(msRiviParit(aika.toString()).size)   
+        //    println(msRiviParit(aika.toString()).size)   
             if(msRiviParit(aika.toString()).size > 1)   // useammalla sama aika
               for(i <-1 until msRiviParit(aika.toString()).size){
                  y += 30
@@ -130,7 +128,7 @@ object Clock_ms extends SimpleSwingApplication {
     listenTo(nimi.keys)
     reactions += {
       case KeyPressed(_, Key.Enter, _, _) =>  {ui.nollaa(); kirjoitettuNimi = nimi.text  ; ui.timer.start }
-      case KeyPressed(_, Key.Control, _, _) =>  {ui.timer.stop;  talleta(); top10() } 
+      case KeyPressed(_, Key.Control, _, _) =>  {ui.timer.stop;  talleta();  top10() } 
     }
   }
   
@@ -138,7 +136,7 @@ object Clock_ms extends SimpleSwingApplication {
   
   def talleta() = {
     val kohdetiedosto = new FileWriter("tulokset", true)
-    val kohdetiedosto_valikoitu = new FileWriter("tulokset_valikoitu", true) 
+    val kohdetiedosto_valikoitu = new FileWriter("tulokset_valikoitu") 
    
     try {
        kohdetiedosto.append(kirjoitettuNimi+";")
@@ -153,24 +151,38 @@ object Clock_ms extends SimpleSwingApplication {
       
       var loytyyko= false
       var tyypinTahanastinenEnnatys = 0
-      for(rivi <- inputFromFile){
-         if (rivi.split(";")(0).equals(kirjoitettuNimi)) loytyyko = true
-         tyypinTahanastinenEnnatys  = rivi.split(";")(2).toInt
+      for(i <- 0 until inputFromFile.size){
+         if (inputFromFile(i).split(";")(0).equals(kirjoitettuNimi)) loytyyko = true
+         tyypinTahanastinenEnnatys  = inputFromFile(i).split(";")(2).toInt
+         if((loytyyko ) && (tyypinTahanastinenEnnatys > ui.msEiNollata ))   // huonompi tulos pois
+          inputFromFile -= inputFromFile(i)
       }  
+       
       
        if((!loytyyko ) || (tyypinTahanastinenEnnatys > ui.msEiNollata ))   {
+          inputFromFile +=  kirjoitettuNimi+";"+ui.min + ":" + ui.s + "." + ui.str +";"+ui.msEiNollata +";"
+          println("JOOOO")
+          for(rivi <- this.inputFromFile){
+             kohdetiedosto_valikoitu.write(rivi+"\n")
+          }        
+          kohdetiedosto_valikoitu.close()
+       }    
+         
+         /*
           try {
              kohdetiedosto_valikoitu.append(kirjoitettuNimi+";")
              kohdetiedosto_valikoitu.append(ui.min + ":" + ui.s + "." + ui.str +";")
              kohdetiedosto_valikoitu.append(ui.msEiNollata +";\n")
           } finally {
              kohdetiedosto_valikoitu.close()
-          }
-       }//if   
+          } */
+      
+      
     }
   }
-   
-   
+  
+  
+      
     var ajat = Buffer[Int]()
     var msRiviParit = Map[String,Buffer[String]]()
     var inputFromFile = Buffer[String]()
