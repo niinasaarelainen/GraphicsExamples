@@ -1,0 +1,88 @@
+import scala.swing._
+import scala.xml
+import scala.io.Source
+import javax.imageio.ImageIO
+import java.io.File
+import javax.swing.ImageIcon
+import javax.swing.JLabel
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import java.awt.image.BufferedImage
+import scala.swing.event.ButtonClicked
+
+object CityTiles extends SimpleSwingApplication {
+
+  // Yksittäistä spriteä kuvaava luokka, joka säilöö kuva, mittasuhteet, id:n sekä mahdollisen lisädatan (string-muotoisia "lippuja")
+  case class Sprite(id: String, image: BufferedImage, width: Int, height: Int, data: Set[String])
+  
+  def getSprites(dataFile: String, imageFile: String) = {
+    // Luetaan spritejen idt ja paikat kuvassa
+    val lines = Source.fromFile(dataFile).getLines()
+    
+    // Luetaan kuvatiedosto 
+    val spriteSheet = ImageIO.read(new File("cityTiles_sheet.png"))
+    
+    // Käydään spritet läpi ja irroitetaan ne isosta kuvasta.
+    // Lopputulos palautetaan funktiosta listana
+    for {
+      line  <- lines.toList
+      items  = line.split(",")
+      id     = items.head
+      bounds = items.tail.take(4).map(_.toInt)
+      data   = items.drop(5).toSet
+      image = spriteSheet.getSubimage(bounds(0), bounds(1), bounds(2), bounds(3))
+    } yield Sprite(id, image, bounds(2), bounds(3), data)
+  }
+  
+ 	def top = new MainFrame {
+
+    title = "City map tests"
+
+    val width = 900
+    val height = 860
+    
+    /**
+     * (swing)-Komponentti ilmoittaa nÃ¤in minimi-, maksimi ja toivekokonsa, joita Layout Manager mahdollisesti noudattaa
+     * sijoitellessaan komponentteja ruudulle.
+     */
+    minimumSize   = new Dimension(width,height)
+    preferredSize = new Dimension(width,height)
+    maximumSize   = new Dimension(width,height)
+
+    // Ladataan Spritet tiedostosta
+    
+    val sprites = getSprites("sprites.csv","cityTiles_sheet.png")
+    
+    /**
+     * city- component hoitaa kartan piirtelyn 
+     */
+    
+    val city = new Component {
+      
+      override def paintComponent(g: Graphics2D) = {
+
+        for {
+          y <- 0 to 20
+          x <- 0 to 5
+        } {
+          val leftPadding = 80
+          val topPadding  = 120
+          val tileWidth   = 132
+          val halfWidth   = 66
+          val halfHeight  = 33
+          
+          val sprite = sprites(x+y*6)
+          
+          val xc = leftPadding + x * tileWidth  - (y % 2) * halfWidth
+          val yc = topPadding  + y * halfHeight - sprite.height
+          
+          g.drawImage(sprite.image, xc, yc, null)
+          
+        }                
+      }
+      
+    }      
+		contents = city
+	}
+  
+}

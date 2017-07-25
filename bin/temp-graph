@@ -1,0 +1,9 @@
+ var tiheys = 2
+      var koko = 200
+      var xy = 5
+      g.drawString("Olen 3D pyramidi. JEEE !", 50, koko + 30)
+      for (i <- 1 to koko/2/xy){
+         g.draw3DRect(xy, xy, koko, koko, true)   // raised =  true
+         xy += 5
+         koko -= 10
+      }   
