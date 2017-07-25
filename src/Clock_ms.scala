@@ -28,7 +28,7 @@ object Clock_ms extends SimpleSwingApplication {
     var ms, msEiNollata = 0
     var str, s, min = "00"
     background = Color.white
-    preferredSize = (380, 590)
+    preferredSize = (420, 590)
   
     
     override def paintComponent(g: Graphics2D) = {
@@ -57,24 +57,35 @@ object Clock_ms extends SimpleSwingApplication {
       var vertaaEdelliseen = 0
       for (aika <- ajat.sorted){
         if(vertaaEdelliseen != aika){
-            g.setColor(Color.RED)
-        //    if(!tallaHetkellaRuudulla.contains(msRiviParit(aika.toString()).head))
-               var nimi = msRiviParit(aika.toString()).head.split(";")(0)
-               g.drawString(nimi, 10, y)
-                
-           
-            g.setColor(Color.WHITE)
-            g.fillRect(190, y, 200, 500)
             
-            g.setColor(Color.RED)
-               g.drawString(msRiviParit(aika.toString()).head.split(";")(1), 200,y)
-               y += 30
+            var nimi = msRiviParit(aika.toString()).head.split(";")(0)
+            if(nimi.equals(kirjoitettuNimi))
+                 g.setColor(Color.BLUE)
+            else g.setColor(Color.RED)   
+            if(nimi.length()>22)
+               g.drawString(nimi.substring(0, 22), 10, y)
+            else  g.drawString(nimi, 10, y)  
+            
+            if(nimi.equals(kirjoitettuNimi))
+                    g.setColor(Color.BLUE)
+            else g.setColor(Color.RED)  
+            g.drawString(msRiviParit(aika.toString()).head.split(";")(1), 310,y)  // tulos
+            y += 30
                
-        //    println(msRiviParit(aika.toString()).size)   
             if(msRiviParit(aika.toString()).size > 1)   // useammalla sama aika
-              for(i <-1 until msRiviParit(aika.toString()).size){
+            for(i <-1 until msRiviParit(aika.toString()).size){
+                 var nimi = msRiviParit(aika.toString())(i).split(";")(0)
+                 if(nimi.equals(kirjoitettuNimi))
+                    g.setColor(Color.BLUE)
+                 else g.setColor(Color.RED)   
+                 if(nimi.length()>22)
+                    g.drawString(nimi.substring(0, 22), 10, y)
+                 else  g.drawString(nimi, 10, y)  
+                 if(nimi.equals(kirjoitettuNimi))
+                    g.setColor(Color.BLUE)
+                 else g.setColor(Color.RED)  
+                 g.drawString(msRiviParit(aika.toString())(i).split(";")(1), 310,y)
                  y += 30
-                 g.drawString(msRiviParit(aika.toString()).head.split(";")(0), 10, y)
               }   
         }   
         vertaaEdelliseen = aika
@@ -161,12 +172,12 @@ object Clock_ms extends SimpleSwingApplication {
       
        if((!loytyyko ) || (tyypinTahanastinenEnnatys > ui.msEiNollata ))   {
           inputFromFile +=  kirjoitettuNimi+";"+ui.min + ":" + ui.s + "." + ui.str +";"+ui.msEiNollata +";"
-          println("JOOOO")
-          for(rivi <- this.inputFromFile){
-             kohdetiedosto_valikoitu.write(rivi+"\n")
-          }        
-          kohdetiedosto_valikoitu.close()
-       }    
+       }   
+       for(rivi <- this.inputFromFile){
+           kohdetiedosto_valikoitu.write(rivi+"\n")
+       }        
+       kohdetiedosto_valikoitu.close()
+       
          
          /*
           try {
@@ -213,7 +224,6 @@ object Clock_ms extends SimpleSwingApplication {
           kokoRivi = msRiviParit(kolmeDataa(2))
           if(!kokoRivi.contains(kolmeDataa(0)))
              kokoRivi += inputFromFile(i)
-          
           msRiviParit += kolmeDataa(2) -> kokoRivi   // täällä usean ihmien tiedot
         }
        
